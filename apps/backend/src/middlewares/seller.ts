@@ -1,23 +1,31 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from "express";
 
 export const isSellerAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-    const header = req.headers["authorization"]
+    const header = req.headers["authorization"];
     const token = header?.split(" ")[1];
 
     if (!token) {
-        res.status(403).json({message: "Unauthorized"})
+        console.log("No token found");
+        res.status(403).json({ message: "Unauthorized" });
         return
     }
 
     try {
-        const decoded = jwt.verify(token, "disha11") as { role: string, userId: string }
+        const decoded = jwt.verify(token, "disha11") as { role: string, userId: string };
         if (decoded.role !== "Seller") {
-            res.status(403).json({message: "Unauthorized"})
+            console.log("Role is not seller");
+            res.status(403).json({ message: "Unauthorized" });
             return
         }
-        } catch(e) {
-        res.status(401).json({message: "Unauthorized"})
+        
+        // Check if userId is being decoded properly
+        console.log("Decoded UserId:", decoded.userId);
+        req.userId = decoded.userId; // Ensure it's set on the request object
+        next();
+    } catch (e) {
+        console.log("Token verification failed");
+        res.status(401).json({ message: "Unauthorized" });
         return
     }
-}
+};

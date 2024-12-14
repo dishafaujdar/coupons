@@ -1,16 +1,33 @@
-import { Router } from "express";
-import { SellerRoute } from "./seller";
-import { CouponsRouter } from "./coupons";
-import { BuyerRoute } from "./buyer";
-import { SignupSchema , SigninSchema } from "../../types/index";
-import client from "@repo/db/client";
-import jwt from "jsonwebtoken";
-export const router = Router();
+    import e, { Router } from "express";
+    import { SellerRoute } from "./seller";
+    import { CouponsRouter } from "./coupons";
+    import { BuyerRoute } from "./buyer";
+    import { SignupSchema , SigninSchema } from "../../types/index";
+    import client from "@repo/db/client";
+    import jwt from "jsonwebtoken";
+    export const router = Router();
+    import express from "express";
+    const app = express();
+    app.use(express.json()); // This parses incoming JSON requests
+
+
+// router.get("/signup" , async (req,res)=>{
+//     res.json({message:"you're at signup"})
+// })
+/*
+{
+    "username":"daskj",
+    "password":"2233",
+    "role":"seller"
+}
+*/
 
 router.post("/signup" , async (req,res) => {
     try {
+        console.log(req.body)
+
         const {username , password , role} = SignupSchema.parse(req.body);
-        if(role === "seller") {
+        if(role === "Seller") {
             const user = await client.user.create({
                 data:{
                     username,
@@ -20,7 +37,7 @@ router.post("/signup" , async (req,res) => {
             });
             res.status(200).json({SellerId: user.id});
             return;
-        } else {
+        } else if (role === "Buyer") {
             const admin = await client.user.create({
                 data:{
                     username,
@@ -30,13 +47,15 @@ router.post("/signup" , async (req,res) => {
             });
             res.status(200).json({BuyerId: admin.id});
             return;
-        }
+        } else {
+            res.status(400).json({ error: "Invalid role" });
+            return;
+        }        
     } catch (error) {
         res.status(400).json({error})
         return;
     }
 });
-
 
 router.post("/signin" , async (req,res) => {
     try {

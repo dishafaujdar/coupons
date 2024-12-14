@@ -1,10 +1,9 @@
 import z from "zod";
-import { router } from "../routes/v1";
 
 export const SignupSchema = z.object({
     username : z.string(),
     password : z.string(),
-    role : z.enum(["buyer","seller"])
+    role : z.enum(["Buyer","Seller"])
 })
 
 export const SigninSchema = z.object({
@@ -24,10 +23,15 @@ export const DeleteCouponsSchema = z.object({
 
 export const SellerSchema = z.object({
     SellerId : z.string(),
+    username : z.string()
 })
 
 export const BuyerSchema = z.object({
     BuyerId : z.string(),
+})
+
+export const SearchCouponSchema = z.object({
+    Name : z.string(),
 })
 
 declare global {

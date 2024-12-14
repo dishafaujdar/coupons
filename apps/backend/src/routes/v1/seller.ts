@@ -44,6 +44,9 @@ SellerRoute.get("/:userid" , isSellerAuthenticated , async (req,res)=>{
 SellerRoute.post("/MyNewCoupon", isSellerAuthenticated , async (req,res)=>{         
     console.log("create new coupons");
     try {
+        const userId = req.userId!;
+        console.log("User ID from JWT:", userId);
+
         const parsedData = CouponsSchema.safeParse(req.body);
         if(!parsedData.success){
             console.log(JSON.stringify(parsedData))
@@ -57,7 +60,7 @@ SellerRoute.post("/MyNewCoupon", isSellerAuthenticated , async (req,res)=>{
                     Name: parsedData.data.Name,
                     Description: parsedData.data.Description,
                     CouponCode: parsedData.data.CouponCode,
-                    CreatorId: req.userId!
+                    CreatorId: userId
                 },
             });
             res.json({couponId : coupon.id});
