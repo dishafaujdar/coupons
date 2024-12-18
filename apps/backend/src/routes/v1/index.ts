@@ -15,11 +15,11 @@
 //     res.json({message:"you're at signup"})
 // })
 /*
-{
-    "username":"daskj",
-    "password":"2233",
-    "role":"seller"
-}
+    {
+        "username":"daskj",
+        "password":"2233",
+        "role":"seller"
+    }
 */
 
 router.post("/signup" , async (req,res) => {
@@ -38,14 +38,14 @@ router.post("/signup" , async (req,res) => {
             res.status(200).json({SellerId: user.id});
             return;
         } else if (role === "Buyer") {
-            const admin = await client.user.create({
+            const user = await client.user.create({
                 data:{
                     username,
                     password,
                     role: "Buyer",
                 },
             });
-            res.status(200).json({BuyerId: admin.id});
+            res.status(200).json({BuyerId: user.id});
             return;
         } else {
             res.status(400).json({ error: "Invalid role" });

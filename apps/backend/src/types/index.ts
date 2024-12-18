@@ -12,9 +12,16 @@ export const SigninSchema = z.object({
 })
 
 export const CouponsSchema = z.object({
-    Name    : z.string(),
+    Name: z.string(),
     Description : z.string(),
     CouponCode: z.string().toUpperCase().toLowerCase()
+})
+
+export const UpdateCouponsSchema = z.object({
+    Name: z.string(),
+    Description : z.string(),
+    CouponCode: z.string().toUpperCase().toLowerCase(),
+    id: z.string()
 })
 
 export const DeleteCouponsSchema = z.object({
@@ -23,7 +30,6 @@ export const DeleteCouponsSchema = z.object({
 
 export const SellerSchema = z.object({
     SellerId : z.string(),
-    username : z.string()
 })
 
 export const BuyerSchema = z.object({
@@ -31,13 +37,18 @@ export const BuyerSchema = z.object({
 })
 
 export const SearchCouponSchema = z.object({
-    Name : z.string(),
+    name : z.string(),
+})
+
+export const SearchAllCouponSchema = z.object({
+    sellerId : z.string() || "",
+    buyerId : z.string() || "",
 })
 
 declare global {
     namespace Express {
         export interface Request{
-            role? : "seller" | "buyer";
+            role? : "Seller" | "Buyer";
             userId?: string;
         }
     }
