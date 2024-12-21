@@ -46,7 +46,7 @@ SellerRoute.get("/userid" , isSellerAuthenticated , async (req,res)=>{
 SellerRoute.post("/MyNewCoupon", isSellerAuthenticated , async (req,res)=>{         
     console.log("create new coupons");
     try {
-        const userId = req.userId;
+        const userId = req.userId;  
 
         const parsedData = CouponsSchema.safeParse(req.body);
         if(!parsedData.success){

@@ -1,18 +1,35 @@
+import CouponDetails from "../pages/Detail";
+import CopyIcon from "./functionShare/CopyIcon"
+import { useState } from "react";
+
 interface CouponCardProps {
-  title: string
-  description: string
-  value: number
+  // id: string
+  Name: string
+  Description: string
   platform: 'Google Pay' | 'PhonePe'
+  CouponCode: string 
 }
 
-export default function CouponCard({ title, description, value, platform }: CouponCardProps) {
+export default function CouponCard({ Name, Description, platform, CouponCode}: CouponCardProps) {
+
+
+  const [isPageOpen , setispageOpen] = useState(false);
+
+  const openPage = () => setispageOpen(true);
+  const closePage = () => setispageOpen(false)
+
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow duration-300 border-l-4 border-accent">
-      <h3 className="text-lg font-semibold text-primary mb-2">{title}</h3>
-      <p className="text-text mb-4">{description}</p>
+    <div className="bg-white shadow-sm rounded-lg p-6 hover:shadow-md transition-shadow duration-300 border-l-4 border-accent cursor-pointer" onClick={openPage}>
+      <h3 className="text-lg font-semibold text-primary mb-2">{Name}</h3>
+      <p className="text-text mb-4">{Description}</p>
       <div className="flex justify-between items-center">
-        <span className="text-accent font-bold">₹{value}</span>
-        <span className="text-sm text-secondary">{platform}</span>
+      <span className="text-sm text-secondary">
+      <CopyIcon textToCopy={CouponCode}/>
+      </span>
+      <span className="text-sm text-secondary">{platform}</span>
+      </div>
+      <div>
+        {isPageOpen && <CouponDetails closePage={closePage}/>}
       </div>
     </div>
   )

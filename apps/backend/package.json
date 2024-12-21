@@ -2,18 +2,21 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "dist/index.js",
-  "scripts": {     
-  "build": "npx esbuild src/index.ts --bundle --outfile=dist/index.js --platform=node --tsconfig=tsconfig.json",
-  "start": "nodemon dist/index.js",
-  "dev": "npm run build && npm run start"
-},
+  "scripts": {
+    "build": "npx esbuild src/index.ts --bundle --outfile=dist/index.js --platform=node --tsconfig=tsconfig.json",
+    "start": "nodemon dist/index.js",
+    "dev": "npm run build && npm run start"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "@repo/db": "workspace:*",
+    "@types/cors": "^2.8.17",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "esbuild": "^0.24.2",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "nodemon": "^3.1.7",

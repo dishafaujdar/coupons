@@ -1,17 +1,19 @@
-    import e, { Router } from "express";
-    import { SellerRoute } from "./seller";
-    import { CouponsRouter } from "./coupons";
-    import { BuyerRoute } from "./buyer";
-    import { SignupSchema , SigninSchema } from "../../types/index";
-    import client from "@repo/db/client";
-    import jwt from "jsonwebtoken";
-    export const router = Router();
-    import express from "express";
-    const app = express();
-    app.use(express.json()); // This parses incoming JSON requests
+import e, { Router } from "express";
+import { SellerRoute } from "./seller";
+import { CouponsRouter } from "./coupons";
+import { BuyerRoute } from "./buyer";
+import { SignupSchema , SigninSchema } from "../../types/index";
+import client from "@repo/db/client";
+import jwt from "jsonwebtoken";
+import cors from "cors";
+export const router = Router();
+import express from "express";
+const app = express();
+app.use(cors())
+app.use(express.json()); 
 
 
-// router.get("/signup" , async (req,res)=>{
+// router.post("/signup" , async (req,res)=>{
 //     res.json({message:"you're at signup"})
 // })
 /*
@@ -88,6 +90,8 @@ router.post("/signin" , async (req,res) => {
         return;
     }
 });
+
+
 
 router.use("/MyCoupon" , SellerRoute )
 router.use("/GetCoupons" , BuyerRoute)
