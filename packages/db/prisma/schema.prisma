@@ -28,10 +28,16 @@ model Coupons {
   CreatorId     String
   creators      User      @relation(fields: [CreatorId] , references: [id])
   CouponCode    String    @unique
+  platform      Platform
 
 }
 
 enum Role {
   Buyer
   Seller
+}
+
+enum Platform {
+  GooglePay
+  PhonePe
 }

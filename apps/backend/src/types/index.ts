@@ -14,7 +14,8 @@ export const SigninSchema = z.object({
 export const CouponsSchema = z.object({
     Name: z.string(),
     Description : z.string(),
-    CouponCode: z.string().toUpperCase().toLowerCase()
+    CouponCode: z.string().toUpperCase().toLowerCase(),
+    Platform: z.enum(["PhonePe","GooglePay"])
 })
 
 export const UpdateCouponsSchema = z.object({
@@ -29,7 +30,7 @@ export const DeleteCouponsSchema = z.object({
 })
 
 export const SellerSchema = z.object({
-    SellerId : z.string(),
+    userId : z.string(),
 })
 
 export const BuyerSchema = z.object({

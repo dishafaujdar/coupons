@@ -8,6 +8,7 @@ import ProfilePage from './pages/Profilepage';
 import SignUp from './pages/SignUp';
 import SignIn from './pages/SignIn';
 import LandingPage from './pages/LandingPage';
+import Signout from './pages/Signout';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -23,12 +24,14 @@ function App() {
                 <Route path="/Home" element={<Home />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/add-coupon" element={<AddCoupon />} />
+
               </>
             ) : (
               <>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/signin" element={<SignIn setIsAuthenticated={setIsAuthenticated} />} />
                 <Route path="/signup" element={<SignUp setIsAuthenticated={setIsAuthenticated} />} />
+                <Route path="/signout" element={<Signout />} />
               </>
             )}
           </Routes>

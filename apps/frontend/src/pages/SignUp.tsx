@@ -20,11 +20,13 @@ export default function SignUp({setIsAuthenticated}: SignInProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
    try {
-     const response = await axios.post("http://localhost:3000/api/v1/signup",{username,password,role});
+    const response = await axios.post("http://localhost:3000/api/v1/signup",{username,password,role});
      
     console.log(response.data);
 
-    localStorage.setItem('userInfo', JSON.stringify({username,password,role}));    
+    const userId = response.data.BuyerId || response.data.SellerId 
+
+    localStorage.setItem('userData', JSON.stringify({username,password,role,userId}));    
     setMessage(`User registered successfully: ${response.data.message}`);
      
     if(response){
@@ -44,8 +46,6 @@ export default function SignUp({setIsAuthenticated}: SignInProps) {
         
       }
     };
-    
-    setIsAuthenticated(true)
     console.log('Sign up with:', { username, password, role});
   };
 

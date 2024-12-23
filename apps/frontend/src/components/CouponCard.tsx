@@ -3,14 +3,14 @@ import CopyIcon from "./functionShare/CopyIcon"
 import { useState } from "react";
 
 interface CouponCardProps {
-  // id: string
+  id: string
   Name: string
   Description: string
-  platform: 'Google Pay' | 'PhonePe'
+  Platform: 'GooglePay' | 'PhonePe'
   CouponCode: string 
 }
 
-export default function CouponCard({ Name, Description, platform, CouponCode}: CouponCardProps) {
+export default function CouponCard({ Name, Description, Platform, CouponCode}: CouponCardProps) {
 
 
   const [isPageOpen , setispageOpen] = useState(false);
@@ -26,7 +26,7 @@ export default function CouponCard({ Name, Description, platform, CouponCode}: C
       <span className="text-sm text-secondary">
       <CopyIcon textToCopy={CouponCode}/>
       </span>
-      <span className="text-sm text-secondary">{platform}</span>
+      <span className="text-sm text-secondary">{Platform}</span>
       </div>
       <div>
         {isPageOpen && <CouponDetails closePage={closePage}/>}

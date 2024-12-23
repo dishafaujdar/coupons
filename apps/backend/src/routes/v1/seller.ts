@@ -23,7 +23,7 @@ SellerRoute.get("/userid" , isSellerAuthenticated , async (req,res)=>{
             return
         }
 
-        if (parsedData.data.SellerId){
+        if (parsedData.data.userId){
             const showCoupons = await client.coupons.findMany({
                 where:{
                     CreatorId: req.userId
@@ -31,20 +31,19 @@ SellerRoute.get("/userid" , isSellerAuthenticated , async (req,res)=>{
             });
             console.log(req.userId)
             if(!showCoupons){
-                res.sendStatus(403).json({message:"no coupon with such SellerId"})
+                res.status(403).json({message:"no coupon with such SellerId"})
             } else {
                 res.json({showCoupons});
                 return
             }
         }
     } catch (error) {
-        res.sendStatus(400).json({error});
+        res.status(400).json({error});
     }
 });
 
 //can post new coupons
 SellerRoute.post("/MyNewCoupon", isSellerAuthenticated , async (req,res)=>{         
-    console.log("create new coupons");
     try {
         const userId = req.userId;  
 
@@ -61,14 +60,15 @@ SellerRoute.post("/MyNewCoupon", isSellerAuthenticated , async (req,res)=>{
                     Name: parsedData.data.Name,
                     Description: parsedData.data.Description,
                     CreatorId: userId || "",
-                    CouponCode: parsedData.data.CouponCode
+                    CouponCode: parsedData.data.CouponCode,
+                    platform: parsedData.data.Platform
                 },
             });
             res.json({couponId : coupon.id});
             return
         }
     } catch (error) {
-        res.sendStatus(400).json({error})
+        res.status(400).json({error})
     }
 })
 

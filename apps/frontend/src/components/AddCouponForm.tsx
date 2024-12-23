@@ -1,44 +1,68 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
-import jwt_decode from "jwt-decode";
 
+interface UserData{
+  token : string    //signin
+}
 
 export default function AddCouponForm() {
-  const [Name, setTitle] = useState('')
+  const [Name, setName] = useState('')
   const [Description, setDescription] = useState('')
   const [CouponCode, setCouponCode] = useState('')
-  const [platform, setPlatform] = useState('Google Pay')
+  const [Platform, setPlatform] = useState('')
+  const [userData , setUserData] = useState<UserData | null>(null)
+
+  useEffect(()=>{
+    const token = localStorage.getItem("userData")
+    const pareseToken = token ? JSON.parse(token) : null;
+    setUserData(pareseToken)  
+    console.log(pareseToken);
+  },[])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    // Here you would typically send the data to your backend
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      const decoded = jwt_decode(token);
-      const userId = decoded?.UserId; 
-      console.log("Extracted UserId:", userId);
-    }
-    const response = await axios.post("http://localhost:3000/api/v1/MyCoupon/MyNewCoupon",{Name,Description,CouponCode})
-    console.log({ Name, Description, CouponCode })
+    e.preventDefault()  
 
-    // Reset form
-    setTitle('')
-    setDescription('')
-    setCouponCode('')
-    setPlatform('Google Pay')
+    if (!userData || !userData.token) {
+      console.error("No user token found. Please log in.");
+      return;
+    }
+    // Here you would typically send the data to your backend
+    try {
+      const response = await axios.post("http://localhost:3000/api/v1/MyCoupon/MyNewCoupon",
+      { Name,
+        Description,
+        CouponCode,
+        Platform,
+        },{
+          headers:{
+            'authorization': `Bearer ${userData.token}`,
+          }
+        })
+      
+      console.log({ Name, Description, CouponCode, Platform })
+      console.log(response.data);
+  
+      // Reset form
+      setName('')
+      setDescription('')
+      setCouponCode('')
+      setPlatform('')
+    } catch (error) {
+      console.error("Error while submitting the form:", error);
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 ">
       <div>
         <label htmlFor="title" className="block text-sm font-medium text-text">Title</label>
         <input
           type="text"
           id="title"
           value={Name}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
           required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+          className="mt-1 block w-full rounded-md shadow-sm cursor-auto"
         />
       </div>
       <div>
@@ -52,16 +76,15 @@ export default function AddCouponForm() {
         />
       </div>
       <div>
-        <label htmlFor="platform" className="block text-sm font-medium text-text">Platform</label>
-        <select
-          id="platform"
-          value={platform}
+        <label htmlFor="Platform" className="block text-sm font-medium text-text">Platform</label>
+        <input
+          type="text"
+          id="Platform"
+          value={Platform}
           onChange={(e) => setPlatform(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-        >
-          <option value="Google Pay">Google Pay</option>
-          <option value="PhonePe">PhonePe</option>
-        </select>
+          required
+          className="mt-1 block w-full rounded-md shadow-sm cursor-auto"
+        />
       </div>
       <div>
         <label htmlFor="Couponcode" className="block text-sm font-medium text-text">Coupon Code</label>

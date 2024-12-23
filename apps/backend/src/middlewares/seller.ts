@@ -10,7 +10,7 @@ declare global {
     namespace Express {
         export interface Request {
             role?: "Seller" | "Buyer";
-            UserId?: string;
+            userId?: string;
         }
     }
 }
@@ -26,7 +26,7 @@ export const isSellerAuthenticated = (req: Request, res: Response, next: NextFun
     }
 
     try {
-        const decoded = jwt.verify(token, "disha11") as { role: string; UserId: string };
+        const decoded = jwt.verify(token, "disha11") as { role: string; userId: string };
 
         if (decoded.role !== "Seller") {
             console.log("Role is not seller");
@@ -34,9 +34,9 @@ export const isSellerAuthenticated = (req: Request, res: Response, next: NextFun
             return;
         }
 
-        req.userId = decoded.UserId;
+        req.userId = decoded.userId;
 
-        console.log("Assigned req.userId:", req.UserId);
+        console.log("Assigned req.userId:", req.userId);
         next();
     } catch (e) {
         console.log("Token verification failed");

@@ -1,39 +1,55 @@
-import { User, Lock, Tag, } from 'lucide-react';
+import { User, Lock, Tag } from 'lucide-react';
 import CouponCard from '../components/CouponCard';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 interface UserInfo {
   username: string;
-  password: string
+  password: string;
   role: 'Seller' | 'Buyer';
   couponsCount: number;
+  userId: string   //signin
 }
 
 interface Coupon {
   id: string;
   title: string;
   description: string;
-  platform: 'Google Pay' | 'PhonePe';  //add in db
-  CouponCode: string;
+  Platform: 'GooglePay' | 'PhonePe';
+  couponCode: string;
 }
 
-const mockUserInfo: UserInfo = {
-  username: 'JohnDoe',
-  password: '@8989',
-  role: 'Seller',
-  couponsCount: 5,
-};
+ export default function ProfilePage() {
+  const [userData, setUserData] = useState<UserInfo | null>(null); // Use proper typing
+  const [coupons, setCoupons] = useState<Coupon[]>([]); // State for coupons
 
-const mockCoupons: Coupon[] = [
-  { id: '1', title: '20% off on groceries', description: 'Valid for 30 days', platform: 'Google Pay' , CouponCode:'jnsckn' },
-  { id: '2', title: '₹50 cashback on recharge', description: 'Min recharge ₹200',  platform: 'PhonePe' , CouponCode:'jnsckn' },
-  { id: '3', title: 'Free movie ticket', description: 'Valid for weekdays only',  platform: 'Google Pay' , CouponCode:'jnsckn' },
-];
+  useEffect(() => {
+    // Fetch user info from localStorage
+    const storedData = localStorage.getItem('userData');
+    const parsedData = storedData ? JSON.parse(storedData) : null;
 
-export default function ProfilePage() {
+    if (parsedData) {
+      setUserData(parsedData); // Set user data
+      // Mock fetching coupons dynamically based on role
+      if (parsedData.role === 'Seller') {
+        setCoupons([
+          { id: '1', title: '20% off on groceries', description: 'Valid for 30 days', Platform: 'GooglePay', couponCode: 'GROC20' },
+          { id: '2', title: '₹50 cashback on recharge', description: 'Min recharge ₹200', Platform: 'PhonePe', couponCode: 'RCASH50' },
+        ]);
+      } else {
+        setCoupons([
+          { id: '3', title: 'Free movie ticket', description: 'Valid for weekdays only', Platform: 'GooglePay', couponCode: 'MOVIEFREE' },
+        ]);
+      }
+    }
+  }, []);
 
-  const userInfo = JSON.parse(localStorage.getItem('userInfo') || "");
-  console.log(userInfo);
-  
+  const response = axios.get("http://localhost:3000/api/v1/MyCoupon/userid",{
+    headers:{
+      'Authorization': `Bearer ${userData?.userId}`,
+    }
+  });
+  console.log(response);
 
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 backdrop-blur-sm flex items-center justify-center overflow-auto">
@@ -42,56 +58,73 @@ export default function ProfilePage() {
         <div className="flex flex-col md:flex-row gap-8">
           {/* Left side: User Info */}
           <div className="w-full md:w-1/3 space-y-6">
-            <div className="flex items-center space-x-4">
-              <User className="text-primary" />
-              <div>
-                <p className="text-sm text-gray-500">Username</p>
-                <p className="font-medium">{userInfo?.username}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Lock className="text-primary" />
-              <div>
-                <p className="text-sm text-gray-500">Password</p>
-                <p className="font-medium">{userInfo?.password}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Tag className="text-primary" />
-              <div>
-                <p className="text-sm text-gray-500">Role</p>
-                <p className="font-medium">{userInfo?.role}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="w-6 h-6 flex items-center justify-center rounded-full bg-primary text-white text-xs">
-                #
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">
-                  {mockUserInfo.role === 'Seller' ? 'Coupons Sold' : 'Coupons Bought'}
-                </p>
-                <p className="font-medium">{mockUserInfo.couponsCount}</p>
-              </div>
-            </div>
+            {userData ? (
+              <>
+                <div className="flex items-center space-x-4">
+                  <User className="text-primary" />
+                  <div>
+                    <p className="text-sm text-gray-500">Username</p>
+                    <p className="font-medium">{userData.username}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <User className="text-primary" />
+                  <div>
+                    <p className="text-sm text-gray-500">UserId</p>
+                    <p className="font-medium">{userData.userId}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <Lock className="text-primary" />
+                  <div>
+                    <p className="text-sm text-gray-500">Password</p>
+                    <p className="font-medium">{userData.password}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <Tag className="text-primary" />
+                  <div>
+                    <p className="text-sm text-gray-500">Role</p>
+                    <p className="font-medium">{userData.role}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="w-6 h-6 flex items-center justify-center rounded-full bg-primary text-white text-xs">
+                    #
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">
+                      {userData.role === 'Seller' ? 'Coupons Sold' : 'Coupons Bought'}
+                    </p>
+                    <p className="font-medium">{userData.couponsCount}</p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p>Loading user data...</p>
+            )}
           </div>
 
           {/* Right side: User's Coupons */}
           <div className="w-full md:w-2/3">
             <h2 className="text-2xl font-semibold text-primary mb-4">
-              {mockUserInfo.role === 'Seller' ? 'Your Listed Coupons' : 'Your Purchased Coupons'}
+              {userData?.role === 'Seller' ? 'Your Listed Coupons' : 'Your Purchased Coupons'}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {mockCoupons.map((coupon) => (
-                <CouponCard
-                  key={coupon.id}
-                  id={coupon.id}
-                  title={coupon.title}
-                  description={coupon.description}
-                  platform={coupon.platform}
-                  couponCode={coupon.CouponCode}
-                />
-              ))}
+              {coupons.length > 0 ? (
+                coupons.map((coupon) => (
+                  <CouponCard
+                    key={coupon.id}
+                    id={coupon.id}
+                    Name={coupon.title}
+                    Description={coupon.description}
+                    Platform={coupon.Platform}
+                    CouponCode={coupon.couponCode}
+                  />
+                ))
+              ) : (
+                <p>No coupons available.</p>
+              )}
             </div>
           </div>
         </div>
@@ -99,4 +132,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

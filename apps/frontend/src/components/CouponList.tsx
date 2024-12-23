@@ -21,10 +21,10 @@ export default function CouponList({ platform }: CouponListProps) {
       {filteredCoupons.map((coupon) => (
         <CouponCard
           key={coupon.id}
-          title={coupon.title}
-          description={coupon.description}
+          Name={coupon.title}
+          Description={coupon.description}
           platform={coupon.platform as 'Google Pay' | 'PhonePe'}
-          couponCode={coupon.couponCode}
+          CouponCode={coupon.couponCode}
         />
       ))}
     </div>

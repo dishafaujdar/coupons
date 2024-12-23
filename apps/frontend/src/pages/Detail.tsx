@@ -8,8 +8,7 @@ interface CouponDetailsProps {
     id: string;
     title: string;
     description: string;
-    value: number;
-    platform: "Google Pay" | "PhonePe";
+    platform: "GooglePay" | "PhonePe";
     likes: number;
     dislikes: number;
     redeemCode: string;
@@ -29,7 +28,6 @@ export default function CouponDetails({ closePage }: CouponDetailsProps) {
     title: "20% off on groceries",
     description:
       "Get 20% off on your next grocery purchase. Valid for 30 days from the date of issue.",
-    value: 100,
     platform: "Google Pay" as const,
     likes: 150,
     dislikes: 10,
@@ -70,9 +68,6 @@ export default function CouponDetails({ closePage }: CouponDetailsProps) {
           />
           <p className="text-text mb-4">{coupon.description}</p>
           <div className="flex justify-between items-center mb-4">
-            <span className="text-accent font-bold text-2xl">
-              ₹{coupon.value}
-            </span>
             <span className="text-secondary">{coupon.platform}</span>
           </div>
           <div className="flex items-center space-x-4 mb-4">

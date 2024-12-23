@@ -5,9 +5,9 @@ import axios from "axios"
 import { useNavigate } from 'react-router-dom';
 
 
-interface SignInProps {
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-}
+  interface SignInProps {
+    setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+  }
 
 export default function SignIn({setIsAuthenticated}: SignInProps) {
 
@@ -22,17 +22,23 @@ export default function SignIn({setIsAuthenticated}: SignInProps) {
     try {
       const response = await axios.post("http://localhost:3000/api/v1/signin",{
         username,
-        password
+        password,
       });
+
+      const token = response.data.token
+
+      console.log(response.data);      
       setMessage(`User registered successfully: ${response.data.message}`);  
-      console.log(response.data);
+
+      localStorage.setItem('userData', JSON.stringify({username,password,token}));  
+      setMessage(`User registered successfully: ${response.data.message}`);
+     
       if(response){
         setIsAuthenticated(true);
         navigate('/Home')
       }else{
         alert('Sign-in failed. Please try again.');
       }
-      
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setMessage(`Error: ${error.response?.data?.error || error.message}`);
