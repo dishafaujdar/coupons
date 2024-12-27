@@ -1,55 +1,65 @@
-import { User, Lock, Tag } from 'lucide-react';
-import CouponCard from '../components/CouponCard';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { User, Lock, Tag } from "lucide-react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 interface UserInfo {
   username: string;
   password: string;
-  role: 'Seller' | 'Buyer';
+  userRole: "Seller" | "Buyer";
   couponsCount: number;
-  userId: string   //signin
+  userId: string; //signin
+  Token: string;
 }
 
 interface Coupon {
   id: string;
-  title: string;
-  description: string;
-  Platform: 'GooglePay' | 'PhonePe';
-  couponCode: string;
+  Name: string;
+  Description: string;
+  Platform: "GooglePay" | "PhonePe";
+  likes: number;
+  dislikes: number;
+  RedeemCode: string;
+  SiteLink: string;
+  ImageUrl: string;
 }
 
- export default function ProfilePage() {
-  const [userData, setUserData] = useState<UserInfo | null>(null); // Use proper typing
-  const [coupons, setCoupons] = useState<Coupon[]>([]); // State for coupons
+export default function ProfilePage() {
+  const [userData, setUserData] = useState<UserInfo | null>(null);
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
 
   useEffect(() => {
-    // Fetch user info from localStorage
-    const storedData = localStorage.getItem('userData');
+    const storedData = localStorage.getItem("userData");
     const parsedData = storedData ? JSON.parse(storedData) : null;
 
-    if (parsedData) {
-      setUserData(parsedData); // Set user data
-      // Mock fetching coupons dynamically based on role
-      if (parsedData.role === 'Seller') {
-        setCoupons([
-          { id: '1', title: '20% off on groceries', description: 'Valid for 30 days', Platform: 'GooglePay', couponCode: 'GROC20' },
-          { id: '2', title: '₹50 cashback on recharge', description: 'Min recharge ₹200', Platform: 'PhonePe', couponCode: 'RCASH50' },
-        ]);
-      } else {
-        setCoupons([
-          { id: '3', title: 'Free movie ticket', description: 'Valid for weekdays only', Platform: 'GooglePay', couponCode: 'MOVIEFREE' },
-        ]);
-      }
+    if (!parsedData || !parsedData.Token) {
+      console.error("No user token found. Please log in.");
+      return;
     }
+
+    setUserData(parsedData);
   }, []);
 
-  const response = axios.get("http://localhost:3000/api/v1/MyCoupon/userid",{
-    headers:{
-      'Authorization': `Bearer ${userData?.userId}`,
+  useEffect(() => {
+    if (userData && userData.Token && userData.userId) {
+      const fetchCoupons = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:3000/api/v1/MyCoupon/${userData.userId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${userData.Token}`,
+              },
+            }
+          );
+          setCoupons(response.data);
+          console.log(response.data);
+        } catch (error) {
+          console.error("Error fetching coupons:", error);
+        }
+      };
+      fetchCoupons();
     }
-  });
-  console.log(response);
+  }, [userData]);
 
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 backdrop-blur-sm flex items-center justify-center overflow-auto">
@@ -84,8 +94,8 @@ interface Coupon {
                 <div className="flex items-center space-x-4">
                   <Tag className="text-primary" />
                   <div>
-                    <p className="text-sm text-gray-500">Role</p>
-                    <p className="font-medium">{userData.role}</p>
+                    <p className="text-sm text-gray-500">userRole</p>
+                    <p className="font-medium">{userData.userRole}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
@@ -94,7 +104,9 @@ interface Coupon {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">
-                      {userData.role === 'Seller' ? 'Coupons Sold' : 'Coupons Bought'}
+                      {userData.userRole === "Seller"
+                        ? "Coupons Sold"
+                        : "Coupons Bought"}
                     </p>
                     <p className="font-medium">{userData.couponsCount}</p>
                   </div>
@@ -108,19 +120,29 @@ interface Coupon {
           {/* Right side: User's Coupons */}
           <div className="w-full md:w-2/3">
             <h2 className="text-2xl font-semibold text-primary mb-4">
-              {userData?.role === 'Seller' ? 'Your Listed Coupons' : 'Your Purchased Coupons'}
+              {userData?.userRole === "Seller"
+                ? "Your Listed Coupons"
+                : "Your Purchased Coupons"}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {coupons.length > 0 ? (
                 coupons.map((coupon) => (
-                  <CouponCard
-                    key={coupon.id}
-                    id={coupon.id}
-                    Name={coupon.title}
-                    Description={coupon.description}
-                    Platform={coupon.Platform}
-                    CouponCode={coupon.couponCode}
-                  />
+                  <li key={coupon.id}>
+                    <h3>{coupon.Name}</h3>
+                    <p>{coupon.Description}</p>
+                    <p>Platform: {coupon.Platform}</p>
+                    <p>Likes: {coupon.likes}</p>
+                    <p>Dislikes: {coupon.dislikes}</p>
+                    <p>Redeem Code: {coupon.RedeemCode}</p>
+                    <a
+                      href={coupon.SiteLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >
+                      Visit Site
+                    </a>
+                    {coupon.ImageUrl && <img src={coupon.ImageUrl} alt={coupon.Name} />}
+                  </li>
                 ))
               ) : (
                 <p>No coupons available.</p>

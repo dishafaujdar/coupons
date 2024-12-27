@@ -1,7 +1,9 @@
 import { Router } from "express";
+import axios from "axios";
+import puppeteer from 'puppeteer';
 export const SellerRoute = Router();
 import { isSellerAuthenticated } from "../../middlewares/seller";
-import { CouponsSchema , DeleteCouponsSchema, SellerSchema, UpdateCouponsSchema } from "../../types";
+import { CouponsSchema , DeleteCouponsSchema, UrlSchema, UpdateCouponsSchema } from "../../types";
 import express from 'express';
 import client from '@repo/db/client';
 const app = express();
@@ -13,25 +15,24 @@ app.use(isSellerAuthenticated)
 
 
 //his own coupons
-SellerRoute.get("/userid" , isSellerAuthenticated , async (req,res)=>{    
-    console.log("all your coupons");
+SellerRoute.get("/:userId" , isSellerAuthenticated , async (req,res)=>{    
     try {
-        const parsedData = SellerSchema.safeParse(req.body);
-        if(!parsedData.success){
-            console.log(JSON.stringify(parsedData))
+        const {userId} = req.params;
+
+        if(!userId){
+            console.log(JSON.stringify(userId))
             res.status(400).json({message: "Validation failed"})
             return
         }
 
-        if (parsedData.data.userId){
+        if (userId){
             const showCoupons = await client.coupons.findMany({
                 where:{
-                    CreatorId: req.userId
+                    CreatorId: userId
                 },
             });
-            console.log(req.userId)
             if(!showCoupons){
-                res.status(403).json({message:"no coupon with such SellerId"})
+                res.status(403).json({message:"No coupon with such SellerId"})
             } else {
                 res.json({showCoupons});
                 return
@@ -43,34 +44,84 @@ SellerRoute.get("/userid" , isSellerAuthenticated , async (req,res)=>{
 });
 
 //can post new coupons
-SellerRoute.post("/MyNewCoupon", isSellerAuthenticated , async (req,res)=>{         
+SellerRoute.post("/MyNewCoupon", isSellerAuthenticated, async (req, res) => {
     try {
         const userId = req.userId;  
 
+        // Check if both manual data and URL are provided
         const parsedData = CouponsSchema.safeParse(req.body);
-        if(!parsedData.success){
-            console.log(JSON.stringify(parsedData))
-            res.status(400).json({message: "Validation failed"})
-            return
-        }
 
-        if(parsedData.data){
+        // If manual data is provided
+        if (parsedData.success && parsedData.data) {
             const coupon = await client.coupons.create({
-                data:{
+                data: {
                     Name: parsedData.data.Name,
                     Description: parsedData.data.Description,
                     CreatorId: userId || "",
-                    CouponCode: parsedData.data.CouponCode,
-                    platform: parsedData.data.Platform
+                    RedeemCode: parsedData.data.RedeemCode,
+                    platform: parsedData.data.Platform,
                 },
             });
-            res.json({couponId : coupon.id});
-            return
+            res.json({ couponId: coupon.id });
+            return;
         }
+
+        // If URL is provided
+        
+        const parsedUrlData = UrlSchema.safeParse(req.body);
+        if (parsedUrlData.success && parsedUrlData.data && parsedUrlData.data.SharedUrl) {
+            const sharedUrl = parsedUrlData.data.SharedUrl;
+            const voucherCode = parsedUrlData.data.RedeemCode;
+
+            try {
+                const browser = await puppeteer.launch();
+                const page = await browser.newPage();
+                await page.goto(sharedUrl, { waitUntil: 'domcontentloaded' });
+        
+                // Extract data from the page
+                const Name = document.querySelector("meta[property='og:title']")?.getAttribute("content") || "Default Name";
+                const Description = document.querySelector("meta[property='og:description']")?.getAttribute("content") || "Default Description";
+                const ImageUrl = document.querySelector("meta[property='og:image']")?.getAttribute("content") || "";
+                const Platform = sharedUrl.includes("google") ? "GooglePay" : "PhonePe"; // Example logic for Platform
+
+                console.log(Name,Description,ImageUrl,Platform);
+                
+                // Close Puppeteer browser
+                await browser.close();
+        
+                // Create coupon in the database
+                const coupon = await client.coupons.create({
+                  data: {
+                    Name,
+                    Description,
+                    CreatorId: userId || "",
+                    RedeemCode: voucherCode || "DEFAULT_CODE",
+                    platform: Platform,
+                    ImageUrl,
+                  },
+                });
+                console.log(coupon);
+                
+                res.json({ couponId: coupon.id, message: "Coupon created from URL", coupon });
+                return;
+
+            } catch (fetchError) {
+                console.error(`Error fetching details from URL:", ${fetchError}`);
+                res.status(400).json({
+                    message: "Failed to fetch details from URL",
+                    error: fetchError
+                });
+                return;
+            }
+        }
+
+        // If neither manual data nor URL is provided
+        res.status(400).json({ message: "Please provide either manual coupon data or a valid shared URL" });
     } catch (error) {
-        res.status(400).json({error})
+        console.log(error);
+        res.status(400).json({ error });
     }
-})
+});
 
 //can delete coupon 
 // instead of using CouponCode try deleting it using the couponid
@@ -119,7 +170,7 @@ SellerRoute.put("/UpdateMyCoupon", isSellerAuthenticated , async (req,res)=>{
                 data:{
                     Name: parsedData.data.Name,
                     Description: parsedData.data.Description,
-                    CouponCode: parsedData.data.CouponCode
+                    RedeemCode: parsedData.data.CouponCode
                 }
             });
              const rmcoupon =  await client.coupons.delete({

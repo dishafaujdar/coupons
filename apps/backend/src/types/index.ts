@@ -3,7 +3,7 @@ import z from "zod";
 export const SignupSchema = z.object({
     username : z.string(),
     password : z.string(),
-    role : z.enum(["Buyer","Seller"])
+    userRole : z.enum(["Buyer","Seller"])
 })
 
 export const SigninSchema = z.object({
@@ -14,8 +14,14 @@ export const SigninSchema = z.object({
 export const CouponsSchema = z.object({
     Name: z.string(),
     Description : z.string(),
-    CouponCode: z.string().toUpperCase().toLowerCase(),
-    Platform: z.enum(["PhonePe","GooglePay"])
+    RedeemCode: z.string().toUpperCase().toLowerCase(),
+    Platform: z.enum(["PhonePe","GooglePay"]),
+    SharedUrl: z.string()
+})
+
+export const UrlSchema = z.object({
+    SharedUrl: z.string(),
+    RedeemCode: z.string()
 })
 
 export const UpdateCouponsSchema = z.object({
@@ -49,7 +55,7 @@ export const SearchAllCouponSchema = z.object({
 declare global {
     namespace Express {
         export interface Request{
-            role? : "Seller" | "Buyer";
+            userRole? : "Seller" | "Buyer";
             userId?: string;
         }
     }

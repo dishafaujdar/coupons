@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { isBuyerAuthenticated } from "../../middlewares/buyer";
-import { BuyerSchema, SearchCouponSchema } from "../../types";
+import { SellerSchema, SearchCouponSchema } from "../../types";
 import express from "express";
 import client from "@repo/db/client";
 export const CouponsRouter = Router();
@@ -34,14 +34,14 @@ BuyerRoute.post("/buyerId/bulk", isBuyerAuthenticated, async (req, res) => {
       },
       select: {
         id: true,
-        CouponCode: true,
+        RedeemCode: true,
         Name: true,
       },
     });
     res.json({
       coupons: coupon.map((m) => ({
         userId: m.id,
-        coupon: m.CouponCode,
+        coupon: m.RedeemCode,
         couponName: m.Name,
       })),
     });
@@ -85,39 +85,4 @@ BuyerRoute.get("/:Name", isBuyerAuthenticated, async (req, res) => {
       console.error("Error fetching coupons:", error);
       res.status(500).json({ error: "Internal server error" });
   }
-});
-
-
-BuyerRoute.get("/:Name", isBuyerAuthenticated, async (req, res) => {
-  console.log("see specific coupons");
-  try {
-    const {Name} = req.params;
-    console.log("Name to search:", Name);
-
-    const parsedData = SearchCouponSchema.safeParse({ username: Name });
-    if (!parsedData.success) {
-      console.log(JSON.stringify(parsedData));
-      res.status(400).json({ message: "Validation failed", error: parsedData.error });
-      return;
-    }
-    const coupon = await client.user.findMany({
-      where: {
-          username: {
-              contains: parsedData.data.name, // Partial match
-              mode: "insensitive", // Case-insensitive search
-          },
-      },
-  });
-
-  // Handle the result
-  if (coupon.length === 0) {
-      res.status(404).json({ message: "No user with found with the given name" });
-      return;
-  }
-
-  res.status(200).json({ message: "User's Coupons retrieved successfully", coupon });
-} catch (error) {
-  console.error("Error fetching coupons:", error);
-  res.status(500).json({ error: "Internal server error" });
-}
 });

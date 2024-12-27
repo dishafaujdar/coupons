@@ -14,20 +14,19 @@ export default function SignUp({setIsAuthenticated}: SignInProps) {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [role , setRole] = useState('')
+  const [userRole , setuserRole] = useState('')
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
    try {
-    const response = await axios.post("http://localhost:3000/api/v1/signup",{username,password,role});
-     
-    console.log(response.data);
+    const response = await axios.post("http://localhost:3000/api/v1/signup",{username,password,userRole});
 
-    const userId = response.data.BuyerId || response.data.SellerId 
+    const { userId, SignupToken } = response.data;
 
-    localStorage.setItem('userData', JSON.stringify({username,password,role,userId}));    
-    setMessage(`User registered successfully: ${response.data.message}`);
+
+    localStorage.setItem('userData', JSON.stringify({username, password, userRole, userId, Token: SignupToken}));    
+    setMessage(`User registered successfully`);
      
     if(response){
       setIsAuthenticated(true);
@@ -46,7 +45,7 @@ export default function SignUp({setIsAuthenticated}: SignInProps) {
         
       }
     };
-    console.log('Sign up with:', { username, password, role});
+    console.log('Sign up with:', { username, password, userRole});
   };
 
   return (
@@ -103,8 +102,8 @@ export default function SignUp({setIsAuthenticated}: SignInProps) {
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                   placeholder="Role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
+                  value={userRole}
+                  onChange={(e) => setuserRole(e.target.value)}
                 />
               </div>
             </div>  

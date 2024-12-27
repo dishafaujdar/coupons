@@ -25,13 +25,10 @@ export default function SignIn({setIsAuthenticated}: SignInProps) {
         password,
       });
 
-      const token = response.data.token
-
-      console.log(response.data);      
-      setMessage(`User registered successfully: ${response.data.message}`);  
-
-      localStorage.setItem('userData', JSON.stringify({username,password,token}));  
-      setMessage(`User registered successfully: ${response.data.message}`);
+      const {SigninToken, userId, userRole} = response.data
+      localStorage.setItem('userData', JSON.stringify({username, password, userRole, userId, Token: SigninToken}));  
+  
+      setMessage(`User registered successfully`);
      
       if(response){
         setIsAuthenticated(true);

@@ -28,28 +28,24 @@ router.post("/signup" , async (req,res) => {
     try {
         console.log(req.body)
 
-        const {username , password , role} = SignupSchema.parse(req.body);
-        if(role === "Seller") {
+        const {username , password , userRole} = SignupSchema.parse(req.body);
+        if(userRole === "Seller" || userRole === "Buyer") {
             const user = await client.user.create({
                 data:{
                     username,
                     password,
-                    role: "Seller"
+                    userRole: userRole 
                 },
             });
-            res.status(200).json({SellerId: user.id});
-            return;
-        } else if (role === "Buyer") {
-            const user = await client.user.create({
-                data:{
-                    username,
-                    password,
-                    role: "Buyer",
-                },
+            const SignupToken = jwt.sign({userId: user.id , userRole: user.userRole},"disha11",{expiresIn: "1h"})
+            res.status(200).json({
+                userId: user.id,
+                SignupToken,
+                userRole: user.userRole,
+                username,
             });
-            res.status(200).json({BuyerId: user.id});
             return;
-        } else {
+        }else {
             res.status(400).json({ error: "Invalid role" });
             return;
         }        
@@ -68,15 +64,19 @@ router.post("/signin" , async (req,res) => {
                 id: true,
                 username: true,
                 password: true,
-                role: true
+                userRole: true
             },
         });
         if(user){
             if(user.password === password){
-                const token = jwt.sign({UserId: user.id , role: user.role}, "disha11");
-                res.json({
-                    token
+                const SigninToken = jwt.sign({userId: user.id , userRole: user.userRole},"disha11",{expiresIn:"1h"})
+                res.status(200).json({
+                    SigninToken,
+                    userId: user.id,
+                    userRole: user.userRole
                 })
+                console.log(SigninToken);
+                
             } else {
                 res.status(400).json({ message: "Invalid username or password" });
                 return;

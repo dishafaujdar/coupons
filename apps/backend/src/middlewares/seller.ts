@@ -9,7 +9,7 @@ app.use(express.json());
 declare global {
     namespace Express {
         export interface Request {
-            role?: "Seller" | "Buyer";
+            userRole?: "Seller" | "Buyer";
             userId?: string;
         }
     }
@@ -19,6 +19,9 @@ export const isSellerAuthenticated = (req: Request, res: Response, next: NextFun
     const header = req.headers["authorization"];
     const token = header?.split(" ")[1];
 
+    console.log(token);
+    
+
     if (!token) {
         console.log("No token found");
         res.status(403).json({ message: "Unauthorized" });
@@ -26,11 +29,12 @@ export const isSellerAuthenticated = (req: Request, res: Response, next: NextFun
     }
 
     try {
-        const decoded = jwt.verify(token, "disha11") as { role: string; userId: string };
+        const decoded = jwt.verify(token, "disha11") as { userRole: string; userId: string };
+        console.log("Decoded Token:", JSON.stringify(decoded, null, 2));
 
-        if (decoded.role !== "Seller") {
+        if (decoded.userRole !== "Seller") {
             console.log("Role is not seller");
-            res.status(403).json({ message: "Unauthorized" });
+            res.status(403).json({ message: "Access restricted to Sellers only" });
             return;
         }
 

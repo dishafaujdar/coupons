@@ -1,7 +1,5 @@
 import { Router } from "express";
 import { isSellerAuthenticated } from "../../middlewares/seller";
-import { isBuyerAuthenticated } from "../../middlewares/buyer";
-import { SearchAllCouponSchema } from "../../types";
 import express from 'express';
 import client from '@repo/db/client';
 export const CouponsRouter = Router();
@@ -13,30 +11,28 @@ CouponsRouter.get("/home", (req,res)=>{
     res.json({message:"at Coupon Route"})
 });
 
-CouponsRouter.get("/all",  async (req,res) => { //despite begin buyer or a seller
-    console.log("see all present the coupon"); 
+CouponsRouter.get("/:Id", async (req, res) => {
+    console.log("Fetching all available coupons...");
+  
     try {
-        const parsedData = SearchAllCouponSchema.safeParse(req.body);
-        if(!parsedData.success){
-            console.log(JSON.stringify(parsedData))
-            res.status(400).json({message: "Validation failed"})
-            return
+      const { Id } = req.params;
+  
+      if (Id) {
+        const coupons = await client.coupons.findMany();
+        if (!coupons || coupons.length === 0) {
+          res.status(200).json({ message: "No coupons available" });
+        } else {
+          res.status(200).json(coupons);
         }
-        const {buyerId , sellerId} = parsedData.data;
-
-        
-        if(buyerId || sellerId){
-            const coupon = await client.coupons.findMany();
-            if(!coupon || coupon.length === 0){
-                res.status(200).json({ message: "No coupons available" });
-            } else {
-                res.status(200).json({message:"all avaliable coupon"})
-            }
-            console.log(coupon);
-        }else {
-            res.status(400).json({ message: "buyerId or sellerId required" });
-        }
+        console.log(coupons);
+      } else {
+        res.status(400).json({ message: "buyerId or sellerId required" });
+      }
     } catch (error) {
-        res.json(400).json({error})
+      console.error("Error fetching coupons:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
-});
+  });
+  
+  export default CouponsRouter;
+
