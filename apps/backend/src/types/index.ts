@@ -16,7 +16,6 @@ export const CouponsSchema = z.object({
     Description : z.string(),
     RedeemCode: z.string().toUpperCase().toLowerCase(),
     Platform: z.enum(["PhonePe","GooglePay"]),
-    SharedUrl: z.string()
 })
 
 export const UrlSchema = z.object({

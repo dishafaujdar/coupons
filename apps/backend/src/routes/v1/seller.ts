@@ -50,6 +50,11 @@ SellerRoute.post("/MyNewCoupon", isSellerAuthenticated, async (req, res) => {
 
         // Check if both manual data and URL are provided
         const parsedData = CouponsSchema.safeParse(req.body);
+        if(!parsedData.success){
+            console.log(JSON.stringify(parsedData))
+            res.status(400).json({message: "Validation failed"})
+            return
+        }
 
         // If manual data is provided
         if (parsedData.success && parsedData.data) {
@@ -65,58 +70,7 @@ SellerRoute.post("/MyNewCoupon", isSellerAuthenticated, async (req, res) => {
             res.json({ couponId: coupon.id });
             return;
         }
-
-        // If URL is provided
         
-        const parsedUrlData = UrlSchema.safeParse(req.body);
-        if (parsedUrlData.success && parsedUrlData.data && parsedUrlData.data.SharedUrl) {
-            const sharedUrl = parsedUrlData.data.SharedUrl;
-            const voucherCode = parsedUrlData.data.RedeemCode;
-
-            try {
-                const browser = await puppeteer.launch();
-                const page = await browser.newPage();
-                await page.goto(sharedUrl, { waitUntil: 'domcontentloaded' });
-        
-                // Extract data from the page
-                const Name = document.querySelector("meta[property='og:title']")?.getAttribute("content") || "Default Name";
-                const Description = document.querySelector("meta[property='og:description']")?.getAttribute("content") || "Default Description";
-                const ImageUrl = document.querySelector("meta[property='og:image']")?.getAttribute("content") || "";
-                const Platform = sharedUrl.includes("google") ? "GooglePay" : "PhonePe"; // Example logic for Platform
-
-                console.log(Name,Description,ImageUrl,Platform);
-                
-                // Close Puppeteer browser
-                await browser.close();
-        
-                // Create coupon in the database
-                const coupon = await client.coupons.create({
-                  data: {
-                    Name,
-                    Description,
-                    CreatorId: userId || "",
-                    RedeemCode: voucherCode || "DEFAULT_CODE",
-                    platform: Platform,
-                    ImageUrl,
-                  },
-                });
-                console.log(coupon);
-                
-                res.json({ couponId: coupon.id, message: "Coupon created from URL", coupon });
-                return;
-
-            } catch (fetchError) {
-                console.error(`Error fetching details from URL:", ${fetchError}`);
-                res.status(400).json({
-                    message: "Failed to fetch details from URL",
-                    error: fetchError
-                });
-                return;
-            }
-        }
-
-        // If neither manual data nor URL is provided
-        res.status(400).json({ message: "Please provide either manual coupon data or a valid shared URL" });
     } catch (error) {
         console.log(error);
         res.status(400).json({ error });

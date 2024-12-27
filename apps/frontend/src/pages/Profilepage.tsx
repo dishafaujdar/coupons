@@ -77,13 +77,13 @@ export default function ProfilePage() {
                     <p className="font-medium">{userData.username}</p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-4">
+                {/* <div className="flex items-center space-x-4">
                   <User className="text-primary" />
                   <div>
                     <p className="text-sm text-gray-500">UserId</p>
                     <p className="font-medium">{userData.userId}</p>
                   </div>
-                </div>
+                </div> */}
                 <div className="flex items-center space-x-4">
                   <Lock className="text-primary" />
                   <div>
@@ -125,24 +125,42 @@ export default function ProfilePage() {
                 : "Your Purchased Coupons"}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {coupons.length > 0 ? (
+              {coupons.length > 0 ? ( 
                 coupons.map((coupon) => (
-                  <li key={coupon.id}>
-                    <h3>{coupon.Name}</h3>
-                    <p>{coupon.Description}</p>
-                    <p>Platform: {coupon.Platform}</p>
-                    <p>Likes: {coupon.likes}</p>
-                    <p>Dislikes: {coupon.dislikes}</p>
-                    <p>Redeem Code: {coupon.RedeemCode}</p>
+                  <div
+                    key={coupon.id}
+                    className="border rounded-lg p-4 shadow hover:shadow-lg transition"
+                  >
+                    <h3 className="font-bold text-lg mb-2">{coupon.Name}</h3>
+                    <p className="text-gray-600 mb-2">{coupon.Description}</p>
+                    <p className="text-sm text-gray-500 mb-1">
+                      <strong>Platform:</strong> {coupon.Platform}
+                    </p>
+                    <p className="text-sm text-gray-500 mb-1">
+                      <strong>Likes:</strong> {coupon.likes}
+                    </p>
+                    <p className="text-sm text-gray-500 mb-1">
+                      <strong>Dislikes:</strong> {coupon.dislikes}
+                    </p>
+                    <p className="text-sm text-gray-500 mb-2">
+                      <strong>Redeem Code:</strong> {coupon.RedeemCode}
+                    </p>
                     <a
                       href={coupon.SiteLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      >
+                      className="text-blue-600 underline mb-2 block"
+                    >
                       Visit Site
                     </a>
-                    {coupon.ImageUrl && <img src={coupon.ImageUrl} alt={coupon.Name} />}
-                  </li>
+                    {coupon.ImageUrl && (
+                      <img
+                      src={coupon.ImageUrl}
+                      alt={coupon.Name}
+                      className="w-full h-auto rounded-lg"
+                      />
+                    )}
+                  </div>
                 ))
               ) : (
                 <p>No coupons available.</p>
