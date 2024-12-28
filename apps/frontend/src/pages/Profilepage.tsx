@@ -1,4 +1,5 @@
 import { User, Lock, Tag } from "lucide-react";
+import { MdDelete } from "react-icons/md";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -7,23 +8,26 @@ interface UserInfo {
   password: string;
   userRole: "Seller" | "Buyer";
   couponsCount: number;
+  RedeemCode: string
   userId: string; //signin
   Token: string;
+  couponId: string;
+
 }
 
 interface Coupon {
   id: string;
   Name: string;
   Description: string;
-  Platform: "GooglePay" | "PhonePe";
-  likes: number;
-  dislikes: number;
+  platform: "GooglePay" | "PhonePe";
   RedeemCode: string;
   SiteLink: string;
   ImageUrl: string;
 }
 
+
 export default function ProfilePage() {
+
   const [userData, setUserData] = useState<UserInfo | null>(null);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
 
@@ -39,6 +43,7 @@ export default function ProfilePage() {
     setUserData(parsedData);
   }, []);
 
+
   useEffect(() => {
     if (userData && userData.Token && userData.userId) {
       const fetchCoupons = async () => {
@@ -51,8 +56,8 @@ export default function ProfilePage() {
               },
             }
           );
-          setCoupons(response.data);
-          console.log(response.data);
+          setCoupons(response.data.showCoupons);
+          console.log(response.data.showCoupons);
         } catch (error) {
           console.error("Error fetching coupons:", error);
         }
@@ -60,6 +65,27 @@ export default function ProfilePage() {
       fetchCoupons();
     }
   }, [userData]);
+
+  //set the api object carefully
+  async function handelDelete() {
+    const GetCouponId = localStorage.getItem("couponId");
+    console.log("Raw couponId from localStorage:", GetCouponId);
+    const parsedId = GetCouponId ? JSON.parse(GetCouponId) : null;
+    console.log("Parsed couponId:", parsedId);
+  
+    if(parsedId && userData?.Token){            
+      const response = await axios.delete(`http://localhost:3000/api/v1/MyCoupon/${parsedId}`,{
+        headers:{
+          "Authorization": `Bearer ${userData.Token}`
+        }
+      })
+      console.log(response.data.couponId);
+    }
+    else{
+      console.log("CouponID || Token incorrect");
+      
+    }
+  }
 
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 backdrop-blur-sm flex items-center justify-center overflow-auto">
@@ -77,13 +103,13 @@ export default function ProfilePage() {
                     <p className="font-medium">{userData.username}</p>
                   </div>
                 </div>
-                {/* <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-4">
                   <User className="text-primary" />
                   <div>
                     <p className="text-sm text-gray-500">UserId</p>
                     <p className="font-medium">{userData.userId}</p>
                   </div>
-                </div> */}
+                </div>
                 <div className="flex items-center space-x-4">
                   <Lock className="text-primary" />
                   <div>
@@ -98,25 +124,11 @@ export default function ProfilePage() {
                     <p className="font-medium">{userData.userRole}</p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <div className="w-6 h-6 flex items-center justify-center rounded-full bg-primary text-white text-xs">
-                    #
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">
-                      {userData.userRole === "Seller"
-                        ? "Coupons Sold"
-                        : "Coupons Bought"}
-                    </p>
-                    <p className="font-medium">{userData.couponsCount}</p>
-                  </div>
-                </div>
               </>
             ) : (
               <p>Loading user data...</p>
             )}
           </div>
-
           {/* Right side: User's Coupons */}
           <div className="w-full md:w-2/3">
             <h2 className="text-2xl font-semibold text-primary mb-4">
@@ -124,48 +136,58 @@ export default function ProfilePage() {
                 ? "Your Listed Coupons"
                 : "Your Purchased Coupons"}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {coupons.length > 0 ? ( 
-                coupons.map((coupon) => (
-                  <div
-                    key={coupon.id}
-                    className="border rounded-lg p-4 shadow hover:shadow-lg transition"
-                  >
-                    <h3 className="font-bold text-lg mb-2">{coupon.Name}</h3>
-                    <p className="text-gray-600 mb-2">{coupon.Description}</p>
-                    <p className="text-sm text-gray-500 mb-1">
-                      <strong>Platform:</strong> {coupon.Platform}
+            {coupons.length > 0 ? (
+              coupons.map((coupon) => (
+                <div
+                  key={coupon.id}
+                  className="relative border rounded-lg p-4 shadow hover:shadow-lg transition"
+                >
+                  <div className="absolute top-4 right-4 flex space-x-4">
+                    <button
+                      onClick={()=>handelDelete()}
+                      className="text-gray-500 hover:text-red-500"
+                      title="Delete Coupon"
+                    >
+                      <MdDelete className="w-5 h-5" />
+                    </button> 
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg mb-2">
+                      {coupon.Name.toUpperCase()}
+                      
+                    </h3>
+                    <p className="text-gray-600 mb-2 text-xl">
+                      {coupon.Description}
                     </p>
-                    <p className="text-sm text-gray-500 mb-1">
-                      <strong>Likes:</strong> {coupon.likes}
+                    <p className="text-xl text-gray-500 mb-1">
+                      <strong>Platform:</strong> {coupon.platform}
                     </p>
-                    <p className="text-sm text-gray-500 mb-1">
-                      <strong>Dislikes:</strong> {coupon.dislikes}
-                    </p>
-                    <p className="text-sm text-gray-500 mb-2">
+                    <p className="text-xl text-gray-500 mb-2">
                       <strong>Redeem Code:</strong> {coupon.RedeemCode}
                     </p>
-                    <a
-                      href={coupon.SiteLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline mb-2 block"
-                    >
-                      Visit Site
-                    </a>
+                    {coupon.SiteLink && (
+                      <a
+                        href={coupon.SiteLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline mb-2 block"
+                      >
+                        Visit Site
+                      </a>
+                    )}
                     {coupon.ImageUrl && (
                       <img
-                      src={coupon.ImageUrl}
-                      alt={coupon.Name}
-                      className="w-full h-auto rounded-lg"
+                        src={coupon.ImageUrl}
+                        alt={coupon.Name}
+                        className="w-full h-auto rounded-lg"
                       />
                     )}
                   </div>
-                ))
-              ) : (
-                <p>No coupons available.</p>
-              )}
-            </div>
+                </div>
+              ))
+            ) : (
+              <p>No coupons available.</p>
+            )}
           </div>
         </div>
       </div>

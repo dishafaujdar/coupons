@@ -70,29 +70,32 @@ SellerRoute.post("/MyNewCoupon", isSellerAuthenticated, async (req, res) => {
             res.json({ couponId: coupon.id });
             return;
         }
-        
+
     } catch (error) {
         console.log(error);
         res.status(400).json({ error });
     }
 });
 
-//can delete coupon 
+//can delete coupon const [EditName, setEditName] = useState('')
+  // const [EditDescription, setEditDescription] = useState('')
+  // const [EditRedeemCode, setEditRedeemCode] = useState('')
+  // const [EditPlatform, setEditPlatform] = useState('')
+
 // instead of using CouponCode try deleting it using the couponid
-SellerRoute.delete("/CouponCode", isSellerAuthenticated , async (req,res)=>{      
+SellerRoute.delete("/:parsedId", isSellerAuthenticated , async (req,res)=>{      
     console.log("delete your coupons");
     try {
-        const parsedData = DeleteCouponsSchema.safeParse(req.body);
-        if(!parsedData.success){
-            console.log(JSON.stringify(parsedData))
+        const {parsedId} = req.params;
+        if(!parsedId){
+            console.log(JSON.stringify(parsedId))
             res.status(400).json({message: "Validation failed"})
             return
         }
-
-        if(parsedData.data){
+        if(parsedId){
             const coupon = await client.coupons.delete({
                 where:{
-                    id: parsedData.data.id
+                    id: parsedId
                 },
             });
             res.status(200).json({message : "coupon has deleted succefully" , coupon});
@@ -108,27 +111,29 @@ SellerRoute.delete("/CouponCode", isSellerAuthenticated , async (req,res)=>{
 })
 
 // instead of using CouponCode try updating it using the couponid
-SellerRoute.put("/UpdateMyCoupon", isSellerAuthenticated , async (req,res)=>{
+SellerRoute.put("/:RedeemCode", isSellerAuthenticated , async (req,res)=>{
     console.log("update your coupons");
     try {
-        const parsedData = UpdateCouponsSchema.safeParse(req.body);
+        
+        const {RedeemCode} = req.params
+        const parsedData = CouponsSchema.safeParse(req.body);
         if(!parsedData.success){
             console.log(JSON.stringify(parsedData))
             res.status(400).json({message: "Validation failed"})
             return
         }
 
-        if(parsedData.data){
+        if(RedeemCode){
             const coupon = await client.coupons.update({
-                where:{ id: parsedData.data.id },
+                where:{ id: RedeemCode },
                 data:{
                     Name: parsedData.data.Name,
                     Description: parsedData.data.Description,
-                    RedeemCode: parsedData.data.CouponCode
+                    RedeemCode: RedeemCode
                 }
             });
              const rmcoupon =  await client.coupons.delete({
-                where:{id: parsedData.data.id},
+                where:{id: RedeemCode},
             })
             res.status(200).json({message : "coupon has updated succefully" , coupon});
             return

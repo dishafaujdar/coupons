@@ -11,7 +11,13 @@ export default function AddCouponForm() {
   const [Description, setDescription] = useState('')
   const [RedeemCode, setRedeemCode] = useState('')
   const [Platform, setPlatform] = useState('')
+  
   const [userData , setUserData] = useState<UserData | null>(null)
+
+  // const [EditName, setEditName] = useState('')
+  // const [EditDescription, setEditDescription] = useState('')
+  // const [EditRedeemCode, setEditRedeemCode] = useState('')
+  // const [EditPlatform, setEditPlatform] = useState('')
 
   useEffect(()=>{
     const Token = localStorage.getItem("userData")
@@ -40,9 +46,9 @@ export default function AddCouponForm() {
           }
         })
       
-      console.log({ Name, Description, RedeemCode, Platform })
-      console.log(response.data);
-  
+      console.log({ Name, Description, RedeemCode, Platform })    
+      const CouponCode = localStorage.setItem('couponId',JSON.stringify((response.data)))
+      console.log(CouponCode);  
       // Reset form
       setName('')
       setDescription('')
