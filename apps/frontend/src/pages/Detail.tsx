@@ -30,64 +30,72 @@ export default function CouponDetails({ coupon, closePage }: CouponDetailsProps)
   };
 
   return (
-    <div className="fixed inset-0 backdrop-blur-md bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div
-        className="bg-white shadow-lg rounded-lg p-6 max-w-2xl mx-auto relative"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={closePage}
-          className="absolute top-4 right-4 bg-gray-200 rounded-full p-2 hover:bg-gray-300"
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 backdrop-blur-sm flex items-center justify-center overflow-auto">
+      <div className="bg-white rounded-lg shadow-xl p-8 m-4 max-w-5xl w-full max-h-[90vh] overflow-auto">
+        <div
+          className="relative"
+          onClick={(e) => e.stopPropagation()}
         >
-          <X size={20} />
-        </button>
-        {coupons.length === 0 ? (
-          <p>No coupon found</p>
-        ) : (
-          <div>
-            <h1 className="text-3xl font-bold text-primary mb-4">
-              {coupon.Name}
-            </h1>
-            <img
-              src={coupon.ImageUrl}
-              alt={coupon.Name}
-              className="w-full h-48 object-cover rounded-md mb-4 shadow-xl"
-            />
-            <p className="text-gray-700 mb-4">{coupon.Description}</p>
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-secondary">{coupon.Platform}</span>
-            </div>
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="flex items-center">
-                <ThumbsUp className="text-primary mr-1" />
-                <span>{coupon.likes}</span>
+          <button
+            onClick={closePage}
+            className="absolute top-4 right-4 bg-gray-200 rounded-full p-2 hover:bg-gray-300"
+          >
+            <X size={20} />
+          </button>
+          {coupons.length === 0 ? (
+            <p className="text-center text-gray-600">No coupon found</p>
+          ) : (
+            <div className="space-y-6">
+              <h1 className="text-3xl font-bold text-primary mb-4">
+                {coupon.Name}
+              </h1>
+              {coupon.ImageUrl && (
+                <img
+                  src={coupon.ImageUrl}
+                  alt={coupon.Name}
+                  className="w-full h-64 object-cover rounded-lg shadow-md"
+                />
+              )}
+              <p className="text-gray-700 text-lg">{coupon.Description}</p>
+              <div className="flex justify-between items-center text-gray-600">
+                <span className="font-semibold">Platform:</span>
+                <span>{coupon.Platform}</span>
               </div>
-              <div className="flex items-center">
-                <ThumbsDown className="text-primary mr-1" />
-                <span>{coupon.dislikes}</span>
+              <div className="flex items-center space-x-4 text-gray-600">
+                <div className="flex items-center">
+                  <ThumbsUp className="text-primary mr-1" />
+                  <span>{coupon.likes}</span>
+                </div>
+                <div className="flex items-center">
+                  <ThumbsDown className="text-primary mr-1" />
+                  <span>{coupon.dislikes}</span>
+                </div>
               </div>
+              <div className="bg-gray-100 p-4 rounded-lg shadow-inner flex justify-between items-center">
+                <span className="font-mono text-lg">{coupon.RedeemCode}</span>
+                <button
+                  onClick={handleCopy}
+                  className="bg-primary text-white px-3 py-1 rounded-md hover:bg-opacity-90 flex items-center"
+                >
+                  <Copy className="mr-1" size={16} />
+                  {copied ? "Copied!" : "Copy"}
+                </button>
+              </div>
+              {coupon.SiteLink && (
+                <a
+                  href={coupon.SiteLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline flex items-center"
+                >
+                  Visit site to redeem <ExternalLink className="ml-1" size={16} />
+                </a>
+              )}
             </div>
-            <div className="bg-gray-100 p-4 rounded-md mb-4 flex items-center justify-between">
-              <span className="font-mono text-lg">{coupon.RedeemCode}</span>
-              <button
-                onClick={handleCopy}
-                className="bg-primary text-white px-3 py-1 rounded-md hover:bg-opacity-90 transition-colors duration-200 flex items-center"
-              >
-                <Copy className="mr-1" size={16} />
-                {copied ? "Copied!" : "Copy"}
-              </button>
-            </div>
-            <a
-              href={coupon.SiteLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline flex items-center"
-            >
-              Visit site to redeem <ExternalLink className="ml-1" size={16} />
-            </a>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
+  
 }

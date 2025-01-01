@@ -69,12 +69,10 @@ export default function ProfilePage() {
   //set the api object carefully
   async function handelDelete() {
     const GetCouponId = localStorage.getItem("couponId");
-    console.log("Raw couponId from localStorage:", GetCouponId);
     const parsedId = GetCouponId ? JSON.parse(GetCouponId) : null;
-    console.log("Parsed couponId:", parsedId);
-  
+      
     if(parsedId && userData?.Token){            
-      const response = await axios.delete(`http://localhost:3000/api/v1/MyCoupon/${parsedId}`,{
+      const response = await axios.delete(`http://localhost:3000/api/v1/MyCoupon/${parsedId.couponId}`,{
         headers:{
           "Authorization": `Bearer ${userData.Token}`
         }

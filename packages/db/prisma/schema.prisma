@@ -19,6 +19,7 @@ model User {
   password      String
   userRole      Role      @default(Seller)
   coupons       Coupons[]
+  like          Like[]
 }
 
 model Coupons {
@@ -29,9 +30,20 @@ model Coupons {
   creators      User      @relation(fields: [CreatorId] , references: [id])
   RedeemCode    String    @unique  @default("")
   platform      Platform
-  SiteLink      String    @default("")
+  SiteLink      String    
   ImageUrl      String    @default("")
+  like          Like[]
 
+}
+
+model Like{
+  id            String    @id     @unique     @default(cuid())
+  userId        String
+  couponId      String
+  user          User      @relation(fields: [userId], references: [id])
+  coupon        Coupons   @relation(fields: [couponId], references: [id])
+
+  @@unique([userId,couponId])
 }
 
 enum Role {

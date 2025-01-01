@@ -22,12 +22,11 @@ export default function CouponList() {
 
   if (error) return <div>Error: {error}</div>;
   if (loading) return <div>Loading...</div>;
-
   return (
     <div>
-      {coupons.length === 0 ? (
+      {Array.isArray(coupons) && coupons.length === 0 ? (
         <p>No coupons available at the moment.</p>
-      ) : (
+      ) : Array.isArray(coupons) ? (
         <ul>
           {coupons.map((coupon) => (
             <li key={coupon.id}>
@@ -45,6 +44,8 @@ export default function CouponList() {
             </li>
           ))}
         </ul>
+      ) : (
+        <p>No coupons available at the moment.</p>
       )}
     </div>
   );

@@ -11,13 +11,9 @@ export default function AddCouponForm() {
   const [Description, setDescription] = useState('')
   const [RedeemCode, setRedeemCode] = useState('')
   const [Platform, setPlatform] = useState('')
+  const [SiteLink, setSiteLink] = useState('')
   
   const [userData , setUserData] = useState<UserData | null>(null)
-
-  // const [EditName, setEditName] = useState('')
-  // const [EditDescription, setEditDescription] = useState('')
-  // const [EditRedeemCode, setEditRedeemCode] = useState('')
-  // const [EditPlatform, setEditPlatform] = useState('')
 
   useEffect(()=>{
     const Token = localStorage.getItem("userData")
@@ -33,20 +29,20 @@ export default function AddCouponForm() {
       console.error("No user token found. Please log in.");
       return;
     }
-    // Here you would typically send the data to your backend
     try {
       const response = await axios.post("http://localhost:3000/api/v1/MyCoupon/MyNewCoupon",
       { Name,
         Description,
         RedeemCode,
         Platform,
+        SiteLink
         },{
           headers:{
             'authorization': `Bearer ${userData.Token}`,
           }
         })
       
-      console.log({ Name, Description, RedeemCode, Platform })    
+      console.log({ Name, Description, RedeemCode, Platform, SiteLink})    
       const CouponCode = localStorage.setItem('couponId',JSON.stringify((response.data)))
       console.log(CouponCode);  
       // Reset form
@@ -54,6 +50,7 @@ export default function AddCouponForm() {
       setDescription('')
       setRedeemCode('')
       setPlatform('')
+      setSiteLink('')
     } catch (error) {
       console.error("Error while submitting the form:", error);
     }
@@ -90,6 +87,18 @@ export default function AddCouponForm() {
           value={Platform}
           onChange={(e) => setPlatform(e.target.value)}
           required
+          className="mt-1 block w-full rounded-md shadow-sm cursor-auto"
+        />
+      </div>
+      <div>
+        <label htmlFor="SiteLink" className="block text-sm font-medium text-text">SiteLink</label>
+        <input
+          type="url"
+          id="SiteLink"
+          value={SiteLink}
+          onChange={(e) => setSiteLink(e.target.value)}
+          required
+          placeholder="https://example.com"
           className="mt-1 block w-full rounded-md shadow-sm cursor-auto"
         />
       </div>

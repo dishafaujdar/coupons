@@ -1,6 +1,4 @@
 import { Router } from "express";
-import axios from "axios";
-import puppeteer from 'puppeteer';
 export const SellerRoute = Router();
 import { isSellerAuthenticated } from "../../middlewares/seller";
 import { CouponsSchema , DeleteCouponsSchema, UrlSchema, UpdateCouponsSchema } from "../../types";
@@ -64,6 +62,7 @@ SellerRoute.post("/MyNewCoupon", isSellerAuthenticated, async (req, res) => {
                     Description: parsedData.data.Description,
                     CreatorId: userId || "",
                     RedeemCode: parsedData.data.RedeemCode,
+                    SiteLink: parsedData.data.SiteLink,
                     platform: parsedData.data.Platform,
                 },
             });
@@ -87,6 +86,7 @@ SellerRoute.delete("/:parsedId", isSellerAuthenticated , async (req,res)=>{
     console.log("delete your coupons");
     try {
         const {parsedId} = req.params;
+        console.log("Received parsedId:", parsedId); 
         if(!parsedId){
             console.log(JSON.stringify(parsedId))
             res.status(400).json({message: "Validation failed"})
@@ -98,7 +98,7 @@ SellerRoute.delete("/:parsedId", isSellerAuthenticated , async (req,res)=>{
                     id: parsedId
                 },
             });
-            res.status(200).json({message : "coupon has deleted succefully" , coupon});
+            res.status(200).json({message : "Coupon has deleted succefully" , coupon});
             return
         } else {
             res.status(403).json({message : "Please provide right CouponCode to delete"});

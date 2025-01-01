@@ -18,10 +18,7 @@ declare global {
 export const isSellerAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     const header = req.headers["authorization"];
     const token = header?.split(" ")[1];
-
-    console.log(token);
     
-
     if (!token) {
         console.log("No token found");
         res.status(403).json({ message: "Unauthorized" });
@@ -30,8 +27,6 @@ export const isSellerAuthenticated = (req: Request, res: Response, next: NextFun
 
     try {
         const decoded = jwt.verify(token, "disha11") as { userRole: string; userId: string };
-        console.log("Decoded Token:", JSON.stringify(decoded, null, 2));
-
         if (decoded.userRole !== "Seller") {
             console.log("Role is not seller");
             res.status(403).json({ message: "Access restricted to Sellers only" });
@@ -39,8 +34,6 @@ export const isSellerAuthenticated = (req: Request, res: Response, next: NextFun
         }
 
         req.userId = decoded.userId;
-
-        console.log("Assigned req.userId:", req.userId);
         next();
     } catch (e) {
         console.log("Token verification failed");

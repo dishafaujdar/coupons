@@ -24,19 +24,18 @@ export const isBuyerAuthenticated = (req: Request, res: Response, next: NextFunc
         res.status(403).json({ message: "Unauthorized" });
         return;
     }
-
+    
     try {
-        const decoded = jwt.verify(token, "disha11") as { userRole: string; UserId: string };
-
+        const decoded = jwt.verify(token, "disha11") as { userRole: string; userId: string };        
         if (decoded.userRole !== "Buyer") {
             console.log("Role is not buyer");
             res.status(403).json({ message: "Access restricted to Buyers only" });
             return;
         }
 
-        req.UserId = decoded.UserId;
+        req.userId = decoded.userId;
 
-        console.log("Assigned req.userId:", req.UserId);
+        console.log("Assigned req.userId:", req.userId);
         next();
     } catch (e) {
         console.log("Token verification failed");

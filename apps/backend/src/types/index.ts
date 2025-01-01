@@ -14,8 +14,9 @@ export const SigninSchema = z.object({
 export const CouponsSchema = z.object({
     Name: z.string(),
     Description : z.string(),
-    RedeemCode: z.string().toUpperCase().toLowerCase(),
+    RedeemCode: z.string(),
     Platform: z.enum(["PhonePe","GooglePay"]),
+    SiteLink: z.string().url(),
 })
 
 export const UrlSchema = z.object({
@@ -50,6 +51,12 @@ export const SearchAllCouponSchema = z.object({
     sellerId : z.string() || "",
     buyerId : z.string() || "",
 })
+
+export const UpvoteSchema = z.object({
+    couponId: z.string(),
+    userId: z.string()
+})
+
 
 declare global {
     namespace Express {

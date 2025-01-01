@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { isBuyerAuthenticated } from "../../middlewares/buyer";
-import { SellerSchema, SearchCouponSchema } from "../../types";
+import { SellerSchema, SearchCouponSchema, UpvoteSchema } from "../../types";
 import express from "express";
 import client from "@repo/db/client";
 export const CouponsRouter = Router();
@@ -84,5 +84,63 @@ BuyerRoute.get("/:Name", isBuyerAuthenticated, async (req, res) => {
   } catch (error) {
       console.error("Error fetching coupons:", error);
       res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+BuyerRoute.post("/upvote", isBuyerAuthenticated, async (req, res) => {
+  console.log("at upvote");
+  try {
+    const parsedData = UpvoteSchema.safeParse(req.body);
+    if (!parsedData.success) {
+      console.log(JSON.stringify(parsedData));
+      res.status(400).json({ message: "Validation failed" });
+      return;
+    }
+    
+    if(parsedData.success){
+        const response = await client.like.create({
+            data:{
+                userId: parsedData.data.userId,
+                couponId: parsedData.data.couponId
+            },
+        })
+        console.log(response);
+    }else{
+        res.status(403).json({message : "userId || couponId is not valid"})
+    }
+
+  } catch (error) {
+    res.status(400).json({error})
+  }
+});
+
+BuyerRoute.post("/downvote", isBuyerAuthenticated, async (req, res) => {
+  try {
+
+    const parsedData = UpvoteSchema.safeParse(req.body);
+    console.log("at downvote");
+    
+    if (!parsedData.success) {
+      console.log(JSON.stringify(parsedData));
+      res.status(400).json({ message: "Validation failed" });
+      return;
+    }
+    
+    if(parsedData.success){
+        const response = await client.like.delete({
+            where:{
+                userId_couponId:{
+                    userId: parsedData.data.userId,
+                    couponId: parsedData.data.couponId
+                }
+            },
+        })
+        console.log(response);
+    }else{
+        res.status(403).json({message : "userId || couponId is not valid"})
+    }
+
+  } catch (error) {
+    res.status(400).json({error})
   }
 });
