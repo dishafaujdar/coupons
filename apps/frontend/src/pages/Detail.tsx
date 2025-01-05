@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { ThumbsUp, ThumbsDown, Copy, ExternalLink, X } from "lucide-react";
+import { Copy, ExternalLink, X } from "lucide-react";
 import { useCoupons } from "../components/functionShare/MockCoupons";
 
 interface CouponDetailsProps {
-  // In a real app, you'd fetch this data based on the ID
   coupon : {
     id: string;
     Name: string;
@@ -15,7 +14,7 @@ interface CouponDetailsProps {
     SiteLink: string;
     ImageUrl: string;
   }
-  closePage: () => void; // Prop to close the modal
+  closePage: () => void; 
 }
 
 
@@ -30,7 +29,7 @@ export default function CouponDetails({ coupon, closePage }: CouponDetailsProps)
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 backdrop-blur-sm flex items-center justify-center overflow-auto">
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 backdrop-blur-lg flex items-center justify-center overflow-auto">
       <div className="bg-white rounded-lg shadow-xl p-8 m-4 max-w-5xl w-full max-h-[90vh] overflow-auto">
         <div
           className="relative"
@@ -60,16 +59,6 @@ export default function CouponDetails({ coupon, closePage }: CouponDetailsProps)
               <div className="flex justify-between items-center text-gray-600">
                 <span className="font-semibold">Platform:</span>
                 <span>{coupon.Platform}</span>
-              </div>
-              <div className="flex items-center space-x-4 text-gray-600">
-                <div className="flex items-center">
-                  <ThumbsUp className="text-primary mr-1" />
-                  <span>{coupon.likes}</span>
-                </div>
-                <div className="flex items-center">
-                  <ThumbsDown className="text-primary mr-1" />
-                  <span>{coupon.dislikes}</span>
-                </div>
               </div>
               <div className="bg-gray-100 p-4 rounded-lg shadow-inner flex justify-between items-center">
                 <span className="font-mono text-lg">{coupon.RedeemCode}</span>

@@ -12,6 +12,8 @@ export default function AddCouponForm() {
   const [RedeemCode, setRedeemCode] = useState('')
   const [Platform, setPlatform] = useState('')
   const [SiteLink, setSiteLink] = useState('')
+  const [likes, setLikes] = useState('')
+  const [dislikes, setDislikes] = useState('')
   
   const [userData , setUserData] = useState<UserData | null>(null)
 
@@ -35,14 +37,16 @@ export default function AddCouponForm() {
         Description,
         RedeemCode,
         Platform,
-        SiteLink
+        SiteLink,
+        likes,
+        dislikes,
         },{
           headers:{
             'authorization': `Bearer ${userData.Token}`,
           }
         })
       
-      console.log({ Name, Description, RedeemCode, Platform, SiteLink})    
+      console.log({ Name, Description, RedeemCode, Platform, SiteLink, likes, dislikes });    
       const CouponCode = localStorage.setItem('couponId',JSON.stringify((response.data)))
       console.log(CouponCode);  
       // Reset form
@@ -51,6 +55,8 @@ export default function AddCouponForm() {
       setRedeemCode('')
       setPlatform('')
       setSiteLink('')
+      setLikes('')
+      setDislikes('')
     } catch (error) {
       console.error("Error while submitting the form:", error);
     }
@@ -112,6 +118,24 @@ export default function AddCouponForm() {
           required
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
         />
+      </div>
+      <div className='flex gap-6 mt-1 w-11 h-11 rounded-md shadow-sm cursor-auto'>
+        <label htmlFor="likes" className="text-sm font-medium text-text">Likes</label>
+        <input
+          type="text"
+          id="likes"
+          value={likes}
+          onChange={(e) => setLikes(e.target.value)}
+          required
+        />
+        <label htmlFor="dislikes" className="text-sm font-medium text-text">Dislikes</label>
+        <input
+          type="text"
+          id="dislikes"
+          value={dislikes}
+          onChange={(e) => setDislikes(e.target.value)}
+          required
+          />
       </div>
       <button type="submit" className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
         Add Coupon

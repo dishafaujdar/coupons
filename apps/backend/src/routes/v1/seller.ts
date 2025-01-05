@@ -50,7 +50,7 @@ SellerRoute.post("/MyNewCoupon", isSellerAuthenticated, async (req, res) => {
         const parsedData = CouponsSchema.safeParse(req.body);
         if(!parsedData.success){
             console.log(JSON.stringify(parsedData))
-            res.status(400).json({message: "Validation failed"})
+            res.status(401).json({message: "Validation failed"})
             return
         }
 

@@ -23,6 +23,8 @@ interface Coupon {
   RedeemCode: string;
   SiteLink: string;
   ImageUrl: string;
+  likes: number;
+  dislikes: number;
 }
 
 
@@ -162,6 +164,11 @@ export default function ProfilePage() {
                     </p>
                     <p className="text-xl text-gray-500 mb-2">
                       <strong>Redeem Code:</strong> {coupon.RedeemCode}
+                    </p>
+                    <p className="text-xl text-gray-500 mb-2">
+                      <strong>Like :</strong> {coupon.likes}
+                      <br />
+                      <strong>Disilke :</strong> {coupon.dislikes}
                     </p>
                     {coupon.SiteLink && (
                       <a

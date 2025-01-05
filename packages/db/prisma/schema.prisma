@@ -20,6 +20,7 @@ model User {
   userRole      Role      @default(Seller)
   coupons       Coupons[]
   like          Like[]
+  dislike       Dislike[]
 }
 
 model Coupons {
@@ -32,11 +33,24 @@ model Coupons {
   platform      Platform
   SiteLink      String    
   ImageUrl      String    @default("")
-  like          Like[]
+  likes         Int       @default(0)
+  dislikes      Int       @default(0)
+  like          Like[]   
+  dislike       Dislike[]
 
 }
 
 model Like{
+  id            String    @id     @unique     @default(cuid())
+  userId        String
+  couponId      String
+  user          User      @relation(fields: [userId], references: [id])
+  coupon        Coupons   @relation(fields: [couponId], references: [id])
+
+  @@unique([userId,couponId])
+}
+
+model Dislike{
   id            String    @id     @unique     @default(cuid())
   userId        String
   couponId      String

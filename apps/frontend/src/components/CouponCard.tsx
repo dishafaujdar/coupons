@@ -33,13 +33,13 @@ export default function CouponCard({
   SiteLink,
   ImageUrl,
 }: CouponCardProps) {
-  const { coupons } = useCoupons();
+  const { coupons } = useCoupons(); 
   const [isPageOpen, setispageOpen] = useState(false);
   const [userData, setUserData] = useState<userData | null>(null);
   const [like, setLike] = useState(false);
   const [dislike, setDislike] = useState(false);
-  const [Likes, setLikes] = useState(likes);
-  const [Dislikes, setDislikes] = useState(dislikes);
+  const [Likes, setLikes] = useState(0);
+  const [Dislikes, setDislikes] = useState(0);
 
   const openPage = () => setispageOpen(true);
   const closePage = () => setispageOpen(false);
@@ -58,19 +58,16 @@ export default function CouponCard({
     }
 
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:3000/api/v1/GetCoupons/upvote",
         { couponId: id, userId: userData.userId },
-        {
-          headers: { authorization: `Bearer ${userData.Token}` },
-        }
+        { headers: { authorization: `Bearer ${userData.Token}` } }
       );
-      console.log(response.data, "Like API Response"); 
 
       setLike(true);
-      setDislike(false); 
+      setDislike(false);
       setLikes((prev) => prev + 1);
-      if (dislike) setDislikes((prev) => prev - 1); 
+      if (dislike) setDislikes((prev) => prev - 1);
     } catch (error) {
       console.error("Error liking coupon:", error);
     }
@@ -83,18 +80,16 @@ export default function CouponCard({
     }
 
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:3000/api/v1/GetCoupons/downvote",
         { couponId: id, userId: userData.userId },
-        {
-          headers: { authorization: `Bearer ${userData.Token}` },
-        }
+        { headers: { authorization: `Bearer ${userData.Token}` } }
       );
-      console.log(response.data, "Dislike API Response"); 
+
       setDislike(true);
-      setLike(false); 
+      setLike(false);
       setDislikes((prev) => prev + 1);
-      if (like) setLikes((prev) => prev - 1); 
+      if (like) setLikes((prev) => prev - 1);
     } catch (error) {
       console.error("Error disliking coupon:", error);
     }
@@ -107,7 +102,10 @@ export default function CouponCard({
       ) : (
         <>
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-primary mb-2" onClick={openPage}>
+            <h3
+              className="text-lg font-semibold text-primary mb-2 cursor-pointer"
+              onClick={openPage}
+            >
               {Name}
             </h3>
             <div className="flex items-center space-x-4 mb-4">
@@ -117,10 +115,11 @@ export default function CouponCard({
                     like ? "scale-125 text-blue-600" : "scale-100"
                   }`}
                   onClick={handleLike}
+                  aria-label="Like"
                 >
-                  <ThumbsUp />  
+                  <ThumbsUp />
                 </div>
-                <span className="text-white">{Likes}</span>
+                <span className="text-primary transition-all duration-300">{Likes}</span>
               </div>
               <div className="flex items-center">
                 <div
@@ -128,10 +127,11 @@ export default function CouponCard({
                     dislike ? "scale-125 text-red-600" : "scale-100"
                   }`}
                   onClick={handleDislike}
+                  aria-label="Dislike"
                 >
                   <ThumbsDown />
                 </div>
-                <span className="text-gray-700">{Dislikes}</span>
+                <span className="text-primary transition-all duration-300">{Dislikes}</span>
               </div>
             </div>
           </div>
