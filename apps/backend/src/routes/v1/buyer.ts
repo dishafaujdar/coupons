@@ -19,9 +19,7 @@ BuyerRoute.get("/:Name", isBuyerAuthenticated, async (req, res) => {
     const parsedData = SearchCouponSchema.safeParse({ name: Name });
     if (!parsedData.success) {
       console.log("Validation Error:", JSON.stringify(parsedData));
-      res
-        .status(400)
-        .json({ message: "Validation failed", error: parsedData.error });
+      res.status(400).json({ message: "Validation failed", error: parsedData.error });
       return;
     }
 

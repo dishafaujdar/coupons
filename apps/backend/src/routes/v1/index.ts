@@ -1,4 +1,4 @@
-import e, { Router } from "express";
+import { Router } from "express";
 import { SellerRoute } from "./seller";
 import { CouponsRouter } from "./coupons";
 import { BuyerRoute } from "./buyer";
@@ -13,21 +13,8 @@ app.use(cors())
 app.use(express.json()); 
 
 
-// router.post("/signup" , async (req,res)=>{
-//     res.json({message:"you're at signup"})
-// })
-/*
-    {
-        "username":"daskj",
-        "password":"2233",
-        "role":"seller"
-    }
-*/
-
 router.post("/signup" , async (req,res) => {
     try {
-        console.log(req.body)
-
         const {username , password , userRole} = SignupSchema.parse(req.body);
         if(userRole === "Seller" || userRole === "Buyer") {
             const user = await client.user.create({
@@ -55,7 +42,7 @@ router.post("/signup" , async (req,res) => {
     }
 });
 
-router.post("/signin" , async (req,res) => {
+router.post("/signin" , async (req,res) => {    
     try {
         const {username, password} = SigninSchema.parse(req.body);
         const user = await client.user.findUnique({
@@ -90,8 +77,6 @@ router.post("/signin" , async (req,res) => {
         return;
     }
 });
-
-
 
 router.use("/MyCoupon" , SellerRoute )
 router.use("/GetCoupons" , BuyerRoute)
